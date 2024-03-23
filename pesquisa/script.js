@@ -4,115 +4,120 @@ function pesquisar() {
     const empresasDiv = document.getElementById('empresas');
     const recursosDiv = document.getElementById('recursos');
 
-    // Verifica se alguma checklist está selecionada
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    let algumaSelecionada = false;
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            algumaSelecionada = true;
-        }
-    });
-
-    // Se alguma estiver selecionada, redireciona para resultado.html no diretório especificado
-    if (algumaSelecionada) {
-        window.location.href = '../resultado/resultado.html'; // Encerra a execução da função
-    }
-    
     // Limpa as listas
     empresasDiv.innerHTML = '';
     recursosDiv.innerHTML = '';
-    
+
     // Função para criar checkbox e adicionar ao div especificado
-    function createCheckbox(container, item) {
+    function createCheckbox(container, item, category) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.id = `${category}-${item.id}`; // Define um id único para o checkbox
         checkbox.name = item.nome;
-        checkbox.value = item.id; // Supondo que cada empresa/recurso tenha um campo 'id' no banco de dados
+        checkbox.value = item.id;
         const label = document.createElement('label');
         label.textContent = item.nome;
+        label.setAttribute('for', checkbox.id); // Associa o label ao checkbox
         const br = document.createElement('br');
+        const separator = document.createElement('hr'); // Adiciona o separador
 
-        // Adiciona evento de clique ao label para marcar/desmarcar o checkbox correspondente
-        label.addEventListener('click', function(event) {
-            checkbox.checked = !checkbox.checked;
+        checkbox.addEventListener('click', function () {
             if (checkbox.checked) {
-                label.classList.add('selected');
+                // Desmarca os checkboxes da outra categoria
+                const otherCategory = category === 'empresas' ? 'recursos' : 'empresas';
+                const otherCheckboxes = document.querySelectorAll(`#${otherCategory} input[type="checkbox"]`);
+                otherCheckboxes.forEach(cb => {
+                    cb.checked = false;
+                    cb.disabled = true;
+                });
             } else {
-                label.classList.remove('selected');
-            }
-            event.stopPropagation(); // Evita que o evento de clique no label seja propagado para o checkbox
-        });
-
-        // Adiciona evento de clique ao checkbox para marcar/desmarcar o label correspondente
-        checkbox.addEventListener('click', function() {
-            if (checkbox.checked) {
-                label.classList.add('selected');
-            } else {
-                label.classList.remove('selected');
+                // Habilita os checkboxes da outra categoria
+                const otherCategory = category === 'empresas' ? 'recursos' : 'empresas';
+                const otherCheckboxes = document.querySelectorAll(`#${otherCategory} input[type="checkbox"]`);
+                otherCheckboxes.forEach(cb => {
+                    cb.disabled = false;
+                });
             }
         });
 
         container.appendChild(checkbox);
         container.appendChild(label);
         container.appendChild(br);
+        container.appendChild(separator); // Adiciona o separador entre os checkboxes
+    }
+
+    // Função para filtrar os dados com base no texto de pesquisa
+    function filtrarDados(data) {
+        return data.filter(item => item.nome.toLowerCase().includes(input));
     }
 
     // Buscar e preencher as colunas de acordo com a pesquisa
     fetch('http://localhost:3000/empresas')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro ao buscar empresas');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Empresas encontradas:', data);
-        const empresasFiltered = data.filter(empresa => empresa.nome.toLowerCase().includes(input));
-        if (empresasFiltered.length === 0) {
-            empresasDiv.textContent = 'Nenhuma empresa encontrada!';
-        } else {
-            empresasFiltered.forEach(empresa => {
-                createCheckbox(empresasDiv, empresa);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao buscar empresas:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar empresas');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Empresas encontradas:', data);
+            const empresasFiltradas = filtrarDados(data);
+            if (empresasFiltradas.length === 0) {
+                empresasDiv.textContent = 'Nenhuma empresa encontrada!';
+            } else {
+                empresasFiltradas.forEach(empresa => {
+                    createCheckbox(empresasDiv, empresa, 'empresas'); // Passa a categoria 'empresas' como parâmetro
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar empresas:', error);
+        });
 
     fetch('http://localhost:3000/recursos')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro ao buscar recursos');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Recursos encontrados:', data);
-        const recursosFiltered = data.filter(recurso => recurso.nome.toLowerCase().includes(input));
-        if (recursosFiltered.length === 0) {
-            recursosDiv.textContent = 'Nenhum recurso encontrado!';
-        } else {
-            recursosFiltered.forEach(recurso => {
-                createCheckbox(recursosDiv, recurso);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao buscar recursos:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao buscar recursos');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Recursos encontrados:', data);
+            const recursosFiltrados = filtrarDados(data);
+            if (recursosFiltrados.length === 0) {
+                recursosDiv.textContent = 'Nenhum recurso encontrado!';
+            } else {
+                recursosFiltrados.forEach(recurso => {
+                    createCheckbox(recursosDiv, recurso, 'recursos'); // Passa a categoria 'recursos' como parâmetro
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar recursos:', error);
+        });
 }
 
-// Adiciona evento de teclado ao campo de entrada
+// Adiciona evento de clique ao botão de redirecionamento
+const redirectButton = document.getElementById('redirectButton');
+redirectButton.addEventListener('click', function () {
+    const empresasSelecionadas = document.querySelectorAll('#empresas input[type="checkbox"]:checked');
+    const recursosSelecionados = document.querySelectorAll('#recursos input[type="checkbox"]:checked');
+    if (empresasSelecionadas.length !== 1 || recursosSelecionados.length !== 0) {
+        alert('Selecione uma empresa para buscar e redirecionar para a tela de resultados.');
+        return;
+    }
+    window.location.href = '../resultado/resultado.html'; // Redireciona para a tela de resultados
+});
+
+// Adiciona evento de pressionar Enter ao campo de pesquisa
 const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault(); // Evita que o formulário seja enviado (caso esteja dentro de um formulário)
-        pesquisar(); // Chama a função de pesquisa
+searchInput.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        pesquisar();
     }
 });
 
 // Chama a função de pesquisa ao carregar a página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     pesquisar();
 });
