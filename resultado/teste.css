@@ -1,0 +1,121 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #000;
+  }
+  
+  header {
+    background-color: #373536;
+    color: #fff;
+    padding: 10px 20px;
+  }
+  
+  header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  header .logo {
+    flex-basis: 20%;
+  }
+
+  header .borda{
+    position: absolute;
+    width:1349px;
+    height: 5px;
+    left: 0px;
+    top: 75px;
+
+    background: #FF9900;
+  }
+  
+  header .titulo {
+    flex-basis: 80%;
+    text-align: right;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 39px;
+  }
+  
+  header h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  header img {
+    max-width: 100%;
+  }
+  
+  .busca {
+    background-color: #f5f5f5;
+    padding: 20px;
+  }
+  
+  .busca .container {
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 1190px;
+    height: 67px;
+    left: 90px;
+    top: 90px;
+
+    background: #D9D9D9;
+    border: 1px solid #373536;
+    border-radius: 20px;
+  }
+  
+  .busca label {
+    display: block;
+    margin-bottom: 5px;
+    
+  }
+  
+  .busca select {
+    width: 200px
+  } 
+
+  .botao{
+    position: absolute;
+    width: 150px;
+    height: 50px;
+    left: 1030px;
+    top: 7px;
+    background: #FF9900;
+    border-radius: 20px;
+
+    font-style: bold;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+
+    color: #000000;
+  }
+
+  footer{
+    /* Rectangle 3 */
+
+    position: absolute;
+    width: 1349px;
+    height: 43px;
+    left: 0px;
+    top: 1024px;
+
+    background: #373536;
+
+  }
